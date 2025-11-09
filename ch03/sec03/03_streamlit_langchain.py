@@ -1,17 +1,12 @@
-# * 랭체인 적용
-# * 이 예제는 user, assistant 모두 동일 대화 출력함
 import streamlit as st
+from langchain.messages import HumanMessage, AIMessage
 
-# 마치 카카오톡 메시지 하나와 같다고 생각하면 됨
-# 메시지 내용(content): 카톡의 글 내용
-# 발신자(role): 이 메시지를 누가 보냈는지? (HUMAN, AI, SYSTEM, TOOL)
-from langchain_core.messages import HumanMessage, AIMessage # * 추가
+st.title("🤖 나만의 챗봇 만들기")
 
-st.title("나만의 LangChain 챗봇 만들기")
+st.caption("랭체인을 사용하지 않고 만들어 보는 챗봇")
 
 if "messages" not in st.session_state:
-    st.session_state["messages"] = []
-
+    st.session_state.messages = []
 
 def print_messages():  # 모든 메시지 출력
     for lang_message in st.session_state["messages"]:
@@ -40,19 +35,11 @@ def add_message(role, message):  # * 메시지 저장
         
     st.session_state["messages"].append(msg_obj)
 
-
-user_input = st.chat_input("궁금한 내용을 물어보세요!")
-
 print_messages()
 
-if user_input:
-    # 1. Streamlit에 사용자 메시지 출력
-    st.chat_message("user").write(user_input)
-    # 2. Streamlit에 어시스턴트 메시지 출력 (사용자 입력 복사)
-    st.chat_message("assistant").write(user_input)
+if prompt := st.chat_input("궁금한 내용을 물어보세요..."):
+    st.chat_message("user").markdown(prompt)
+    st.chat_message("assistant").markdown(prompt)
 
-    # 3. LangChain 세션에 메시지 저장
-    add_message("user", user_input)
-    add_message("assistant", user_input)
-
-print(st.session_state["messages"])
+    add_message("user", prompt)
+    add_message("assistant", prompt)
