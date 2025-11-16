@@ -27,8 +27,16 @@ if "runnable" not in st.session_state:
     st.session_state.last_prompt = None
     st.session_state.last_task = ""
 
+
+def clear_task_input():
+    st.session_state.take_input = ""
+    st.session_state["message"] = []
+    st.session_state.runnable = None
+    st.session_state.last_prompt = None
+    st.session_state.last_mask = None
+
 with st.sidebar:
-    clear_btn = st.button("초기화")
+    clear_btn = st.button("초기화", on_click=clear_task_input)
 
     prompt_files = glob.glob("prompts_multi_turn/*.yaml")
     prompt_labels = {
@@ -89,7 +97,6 @@ def get_session_history(session_id):
         st.session_state.chat_histories[session_id] = ChatMessageHistory()
     return st.session_state.chat_histories[session_id]
 
-# 프롬프트나 TASK가 변경되었을 경우에만 runnable을 새로 생성
 if (
     st.session_state.runnable is None
     or st.session_state.last_prompt != selected_prompt
@@ -111,15 +118,26 @@ if prompt := st.chat_input("궁금한 내용을 물어보세요..."):
     st.chat_message("user").markdown(prompt)
     add_message("user", prompt)
 
-    response = st.session_state.runnable.invoke(
-        {
-            "question": prompt
-        },
-        config={"configurable": {"session_id": "any"}}
+    # response = st.session_state.runnable.invoke(
+    #     {
+    #         "question": prompt
+    #     },
+    #     config={"configurable": {"session_id": "any"}}
+    # )
+
+    response = st.session_state.runnable.stream(
+        {"question": prompt}, config={"configurable": {"session_id": "any"}}
     )
 
-    st.chat_message("assistant").markdown(response)
+    with st.chat_message("assistant"):
+        container = st.empty()
 
-    add_message("assistant", response)
+        ai_answer = ""
+
+        for token in response:
+            ai_answer += token
+            container.markdown(ai_answer)
+
+    add_message("assistant", ai_answer)
 
 print(st.session_state.messages)
