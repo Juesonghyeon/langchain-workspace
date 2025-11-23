@@ -7,6 +7,7 @@ from langchain_core.prompts import load_prompt
 from langchain_google_genai import ChatGoogleGenerativeAI, GoogleGenerativeAIEmbeddings
 from langchain_core.runnables import RunnablePassthrough
 from langchain_community.vectorstores import FAISS
+from langchain_ollama import OllamaEmbeddings
 
 import shutil  # * 파일 및 디렉토리 작업용
 import uuid  # * 고유 키 생성을 위한 uuid 모듈 임포트
@@ -17,7 +18,6 @@ load_dotenv()
 
 st.title("📄PDF 기반 QA")
 st.caption("Ollama BGE-M3 + Gemini-2.5-FLASH")
-st.caption("gemini-embedding-001 + Gemini-2.5-FLASH") # * 캡션 추가.
 
 if not os.path.exists(".cache"): # * 폴더 앞에 .을 붙이면 숨김 처리함(Linux, macOS)을 의미
     os.mkdir(".cache")
@@ -38,12 +38,10 @@ if "chain" not in st.session_state:
     st.session_state["chain"] = None
 
 def _get_or_create_vectorstore(file_name, splitted_documents=None):
-    # 임베딩 모델 준비
-    # gemini-embedding-001 모델은 QUOTA 오류 발생할 수 있음
-    # 참고) https://ai.google.dev/gemini-api/docs/rate-limits?hl=ko
-    embedding_model = GoogleGenerativeAIEmbeddings(
-        model="gemini-embedding-001",
-        transport='rest' # Streamlit의 동기적인 환경과 호환되도록 설정(기본값은 비동기)
+    # * bge-m3 임베딩 모델 준비
+    # OllamaEmbeddings 랭체인 문서: https://python.langchain.com/docs/integrations/text_embedding/ollama/
+    embedding_model = OllamaEmbeddings(
+        model="bge-m3",
     )
 
     embedding_path = f".cache/embeddings/{file_name}"
