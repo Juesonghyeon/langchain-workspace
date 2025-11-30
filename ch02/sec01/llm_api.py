@@ -1,12 +1,11 @@
 # 모듈 설치
 # 1. Gemini 모델
 # uv add google-genai
-# https://ai.google.dev/gemini-api/docs/quickstart?hl=ko
-
+# https://ai.google.dev/gemini-api/docs/quickstart
+# 
 # 2. 환경 변수
 # uv add python-dotenv
 # https://pypi.org/project/python-dotenv/
-
 from google import genai
 
 import os

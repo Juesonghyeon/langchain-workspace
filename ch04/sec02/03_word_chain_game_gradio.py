@@ -1,25 +1,14 @@
+from langchain_core.runnables import RunnablePassthrough
+from langchain_community.chat_message_histories import ChatMessageHistory
+from langchain_core.prompts import ChatPromptTemplate
+from langchain_core.runnables.history import RunnableWithMessageHistory
+from langchain_google_genai import ChatGoogleGenerativeAI
 import os
 from dotenv import load_dotenv
 load_dotenv()
 
 gemini_api_key = os.getenv("GEMINI_API_KEY")
-
-from langchain_google_genai import ChatGoogleGenerativeAI
-
 llm = ChatGoogleGenerativeAI(model="gemini-2.5-flash", google_api_key=gemini_api_key)
-
-from langchain_community.chat_message_histories import ChatMessageHistory
-from langchain_core.prompts import ChatPromptTemplate
-from langchain_core.runnables.history import RunnableWithMessageHistory
-
-
-# 대화 기록을 저장할 히스토리 클래스 불러오기
-chat_history = ChatMessageHistory()
-
-from langchain_community.chat_message_histories import ChatMessageHistory
-from langchain_core.prompts import ChatPromptTemplate
-from langchain_core.runnables.history import RunnableWithMessageHistory
-
 
 # 대화 기록을 저장할 히스토리 클래스 불러오기
 chat_history = ChatMessageHistory()
@@ -51,12 +40,11 @@ chain_with_message_history = RunnableWithMessageHistory(
     history_messages_key="chat_history",
 )
 
-from langchain_core.runnables import RunnablePassthrough
-
 def summarize_messages(chain_input):
     stored_messages = chat_history.messages
     if len(stored_messages) == 0:
-        return False
+        # return False
+        return
     summarization_prompt = ChatPromptTemplate.from_messages(
         [
             ("placeholder", "{chat_history}"),
@@ -77,7 +65,8 @@ def summarize_messages(chain_input):
     # 생성된 새로운 요약내용으로 기록 채우기
     chat_history.add_message(summary_message)
 
-    return True
+    # return True
+    return
 
 chain_with_summarization = (
     # RunnablePassthrough는 LCEL에서 사용, 입력값을 다음 단계로 그대로 통과시키는 역할
@@ -95,22 +84,22 @@ chain_with_summarization = (
 #             )
 #     print("🤖 AI TURN : ", response.content) # AIMessage 객체에서 .content 추출
 
-import random
 import gradio as gr
 
 def word_chain_response(message, history):
-        response = chain_with_summarization.invoke(
-                {"input": message},
-                {"configurable": {"session_id": "unused"}},
-            )
-        return response.content
+    response = chain_with_summarization.invoke(
+            {"input": message},
+            {"configurable": {"session_id": "unused"}},
+        )
+    return response.content
 
 demo = gr.ChatInterface(
-     word_chain_response,
-     type="messages",
-     autofocus=False,
-     title=" 끝말잇기 게임",
-     description="AI와 함께 끝말잇기 게임을 해보세요! 단어만 입력하면 됩니다.")
+    word_chain_response, 
+    type="messages", 
+    autofocus=False,
+    title="🗣️끝말잇기 게임",
+    description="AI와 함께 끝말잇기 게임을 해보세요! 단어만 입력하면 됩니다."
+    )
 
 if __name__ == "__main__":
     demo.launch()

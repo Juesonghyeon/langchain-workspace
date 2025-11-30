@@ -9,11 +9,10 @@
 
 *기울임체*
 
-
 > https://www.markdownguide.org/cheat-sheet/
 
-``` bash
-# 주피터 노트북 의존성 설치 명령
+```bash
+# 주피터 노특북 의존성 설치 명령
 uv add ipykernel jupyter jupyterlab
 ```
 

@@ -13,5 +13,5 @@ dependencies = [
     "langchain-google-genai>=3.0.0",
     "pyarrow>=22.0.0",
     "python-dotenv>=1.2.1",
-    "streamlit>=1.48.0",
+    "streamlit>=1.50.0",
 ]

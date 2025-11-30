@@ -1,13 +1,14 @@
 import streamlit as st
-from langchain_core.messages.chat import ChatMessage
-from langchain_text_splitters import RecursiveCharacterTextSplitter
-from langchain_community.document_loaders import PyMuPDFLoader
-from langchain_core.output_parsers import StrOutputParser
-from langchain_core.prompts import load_prompt
-from langchain_google_genai import ChatGoogleGenerativeAI, GoogleGenerativeAIEmbeddings
+from langchain_ollama import OllamaEmbeddings
 from langchain_core.runnables import RunnablePassthrough
 from langchain_community.vectorstores import FAISS
-from langchain_ollama import OllamaEmbeddings
+from langchain_google_genai import ChatGoogleGenerativeAI
+from langchain_text_splitters import RecursiveCharacterTextSplitter
+from langchain_community.document_loaders import PyMuPDFLoader
+from langchain_core.messages.chat import ChatMessage
+from langchain_google_genai import ChatGoogleGenerativeAI
+from langchain_core.output_parsers import StrOutputParser
+from langchain_core.prompts import load_prompt
 
 import shutil  # * 파일 및 디렉토리 작업용
 import uuid  # * 고유 키 생성을 위한 uuid 모듈 임포트
@@ -37,6 +38,8 @@ if "messages" not in st.session_state:
 if "chain" not in st.session_state:
     st.session_state["chain"] = None
 
+# * 헬퍼 함수 정의
+# 벡터스토어 생성 또는 로드
 def _get_or_create_vectorstore(file_name, splitted_documents=None):
     # * bge-m3 임베딩 모델 준비
     # OllamaEmbeddings 랭체인 문서: https://python.langchain.com/docs/integrations/text_embedding/ollama/
@@ -69,7 +72,7 @@ def embed_file(file):
     file_path = f"./.cache/files/{file.name}"
     with open(file_path, "wb") as f:
         f.write(file_content)
-    
+
     # * 문서 로드
     # loader = PDFPlumberLoader(file_path)
     loader = PyMuPDFLoader(file_path)
@@ -96,14 +99,14 @@ def create_chain(retriever, prompt_filepath):
 
     llm = ChatGoogleGenerativeAI(
         model="gemini-2.5-flash",
-        temperature=0,)
+        temperature=0)
 
     output_parsers = StrOutputParser()
 
     chain = (
-        {"context": retriever, "question": RunnablePassthrough()}
-        | prompt
-        | llm
+        {"context": retriever, "question": RunnablePassthrough()} 
+        | prompt 
+        | llm 
         | output_parsers
     )
 
@@ -118,7 +121,7 @@ def add_message(role, message):
     st.session_state["messages"].append(
         ChatMessage(role=role, content=message))
 
-# * 대화 초기화
+# 대화 초기화
 def clear_task():
     st.session_state["messages"] = []
     st.session_state["chain"] = None
@@ -138,12 +141,9 @@ def clear_task():
 
 with st.sidebar:
     clear_btn = st.button("대화 초기화", on_click=clear_task) # * on_click 인자로 clear_task 함수를 직접 호출
-
     uploaded_file = st.file_uploader("파일 업로드", type=["pdf"])
 
-    selected_prompt = "prompts/pdf-rag.yaml"
-
-# print("selected_prompt:", selected_prompt)
+selected_prompt = "prompts/pdf-rag.yaml"
 
 if uploaded_file:
     # * 벡터 저장소, 체인 생성
@@ -151,13 +151,11 @@ if uploaded_file:
     chain = create_chain(retriever, selected_prompt)
     st.session_state["chain"] = chain
 
-user_input = st.chat_input("무엇이 궁궁하신가요?")
-
 warning_msg = st.empty() # * 파일 업로드 경고 메시지
 
 print_messages()
 
-if user_input:
+if user_input := st.chat_input("궁금한 내용을 물어보세요!"):
     if st.session_state["chain"] is not None:
         st.chat_message("user").write(user_input)
         response = st.session_state["chain"].stream(user_input) # * RunnablePassthrough()에 문자열 전달
@@ -176,9 +174,6 @@ if user_input:
     else:
         warning_msg.error("파일을 업로드해 주세요.")
 
-    add_message("user", user_input)
-    add_message("assistant", ai_answer)
-
 print("st.session_state.messages:", st.session_state.messages)
 
-#"본 연구에서 Private LLM 구축을 위해 수집한 문서의 총 페이지 수와 문서 유형별 비율은 어떻게 되나요?"
+#  본 연구에서 Private LLM 구축을 위해 수집한 문서의 총 페이지 수와 문서 유형별 비율은 어떻게 되나요?

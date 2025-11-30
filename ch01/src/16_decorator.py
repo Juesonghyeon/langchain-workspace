@@ -1,4 +1,4 @@
-# 데코레이터 (Decorator), 장식자
+# 데코레이터(Decorator)
 def my_decorator(func):
     def wrapper():
         print("함수 실행 전입니다.")

@@ -4,9 +4,9 @@
 import time
 
 def fetch_data_sync(delay):
-    print(f"데이터를 가져오기 시작 (딜레이: {delay}초)")
-    time.sleep(delay) #2초 대기
-    print(f"데이터를 가져오기 완료 (딜레이: {delay}초)")
+    print(f"동기 데이터 가져오기 시작 (딜레이: {delay}초)")
+    time.sleep(delay)
+    print(f"동기 데이터 가져오기 완료 (딜레이: {delay}초)")
     return f"동기 데이터 (딜레이 {delay})"
 
 def main_sync():

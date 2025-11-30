@@ -171,7 +171,7 @@ with st.sidebar:
     selected_model = st.selectbox(
         "LLM 선택",
         ["gemini-2.5-pro", "gemini-2.5-flash",
-            "gemini-2.5-flash-lite", "gemma3:latest"],
+            "gemini-2.5-flash-lite", "gemma3:270m"],
         index=1
     )
 
@@ -226,4 +226,4 @@ if user_input:
 print("st.session_state.messages:", st.session_state.messages)
 
 # [질문 예시]
-# 본 연구에서 Private LLM 성능을 평가하기 위해 사용한 지표 3가지는 무엇인가요?
+# 본 연구에서 Private LLM 구축을 위해 수집한 문서의 총 페이지 수와 문서 유형별 비율은 어떻게 되나요?

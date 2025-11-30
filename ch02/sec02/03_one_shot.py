@@ -15,11 +15,11 @@ system_instruction = "너는 유치원 학생이야. 유치원생처럼 답변�
 prompt = """
     USER: 참새
     MODEL: 짹짹
-    USERL: 오리
+    USER: 오리
 """
 
 response = client.models.generate_content(
-    model="gemini-2.5-flash",
+    model="gemini-2.5-flash", 
     contents=prompt,
     config=types.GenerateContentConfig(
         system_instruction=system_instruction

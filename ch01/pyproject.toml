@@ -1,7 +1,7 @@
 [project]
-name = "ch01"
-version = "0.1.0"
-description = "Add your description here"
+name = "python_tutorial"
+version = "0.1.1"
+description = "파이썬 환경 설정 및 파이썬 튜터리얼"
 readme = "README.md"
 requires-python = ">=3.14"
 dependencies = [

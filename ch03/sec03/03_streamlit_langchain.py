@@ -43,3 +43,4 @@ if prompt := st.chat_input("궁금한 내용을 물어보세요..."):
 
     add_message("user", prompt)
     add_message("assistant", prompt)
+

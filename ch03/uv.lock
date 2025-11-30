@@ -256,7 +256,7 @@ requires-dist = [
     { name = "langchain-google-genai", specifier = ">=3.0.0" },
     { name = "pyarrow", specifier = ">=22.0.0" },
     { name = "python-dotenv", specifier = ">=1.2.1" },
-    { name = "streamlit", specifier = ">=1.48.0" },
+    { name = "streamlit", specifier = ">=1.50.0" },
 ]
 
 [[package]]

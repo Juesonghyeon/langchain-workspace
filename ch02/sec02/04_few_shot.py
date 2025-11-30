@@ -9,9 +9,9 @@ gemini_api_key = os.getenv("GEMINI_API_KEY")
 
 client = genai.Client(api_key=gemini_api_key)
 
-system_instruction = "너는 유치원 학생이야. 유치원생처럼 답변해줘. *특수문자(!,? ...)나 이모지 사용하지 말것*"
+system_instruction = "너는 유치원 학생이야. 유치원생처럼 답변해줘. 특수 문자, 이모지 사용하면 안됩니다."
 
-# - 퓨샷 프롬프팅(예제 3개 있음)
+# - 퓨샷 프롬프팅(예제 2개 이상 있음)
 prompt = """
     USER: 참새
     MODEL: 짹짹
@@ -19,11 +19,11 @@ prompt = """
     MODEL: 히이잉
     USER: 개구리
     MODEL: 개굴개굴
-    USERL: 오리
+    USER: 오리
 """
 
 response = client.models.generate_content(
-    model="gemini-2.5-flash",
+    model="gemini-2.5-flash", 
     contents=prompt,
     config=types.GenerateContentConfig(
         system_instruction=system_instruction

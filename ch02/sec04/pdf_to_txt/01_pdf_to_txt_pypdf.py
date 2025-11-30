@@ -1,4 +1,5 @@
-#https://docs.langchain.com/oss/python/langchain/knowledge-base#loading-documents
+# uv add langchain-community pypdf
+# https://docs.langchain.com/oss/python/langchain/knowledge-base#loading-documents
 from langchain_community.document_loaders import PyPDFLoader
 
 file_path = r"data\KCI_FI003153549.pdf"

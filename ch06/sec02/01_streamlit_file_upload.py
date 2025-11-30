@@ -8,8 +8,6 @@ import os
 from dotenv import load_dotenv
 load_dotenv()
 
-gemini_api_key = os.getenv("GEMINI_API_KEY")
-
 st.title("📄PDF 기반 QA")
 
 if not os.path.exists(".cache"): # * 폴더 앞에 .을 붙이면 숨김 처리함(Linux, macOS)을 의미
@@ -39,8 +37,7 @@ def create_chain(prompt_filepath):
 
     llm = ChatGoogleGenerativeAI(
         model="gemini-2.5-flash",
-        temperature=0,
-        google_api_key=gemini_api_key)
+        temperature=0)
 
     output_parsers = StrOutputParser()
 
@@ -97,4 +94,4 @@ if user_input:
 
 print("st.session_state.messages:", st.session_state.messages)
 
-#"본 연구에서 Private LLM 구축을 위해 수집한 문서의 총 페이지 수와 문서 유형별 비율은 어떻게 되나요?"
+#  본 연구에서 Private LLM 구축을 위해 수집한 문서의 총 페이지 수와 문서 유형별 비율은 어떻게 되나요?
