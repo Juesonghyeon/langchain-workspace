@@ -1,5 +1,5 @@
 import streamlit as st
-from langchain_community.document_loaders import UnstructuredFileLoader
+from langchain_community.document_loaders import PyMuPDFLoader
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.runnables.history import RunnableWithMessageHistory
@@ -35,7 +35,7 @@ chat = ChatGoogleGenerativeAI(
 def load_and_parse_pdf(pdf_path):
     """PDF 파일을 로드하고 파싱하여 세션 상태에 저장합니다."""
 
-    loader = UnstructuredFileLoader(pdf_path)
+    loader = PyMuPDFLoader(pdf_path)
     docs = loader.load()
 
     pdf_context = ''
@@ -215,6 +215,8 @@ if submit_button and pdf_file is not None and not st.session_state.pdf_processed
         temp_path = temp_pdf.name
 
     st.session_state.pdf_path = temp_path
+
+    # print("st.session_state.pdf_path:", st.session_state.pdf_path)
 
     with st.spinner('PDF를 분석하고 있습니다...'):
         load_and_parse_pdf(st.session_state.pdf_path)

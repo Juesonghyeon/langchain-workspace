@@ -3,6 +3,8 @@ from langchain_core.messages.chat import ChatMessage
 from langchain_core.prompts import ChatPromptTemplate 
 from langchain_google_genai import ChatGoogleGenerativeAI 
 from langchain_core.output_parsers import StrOutputParser 
+from langchain_core.messages import SystemMessage, HumanMessage, AIMessage
+from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 
 from dotenv import load_dotenv
 load_dotenv()
@@ -32,17 +34,15 @@ def add_message(role, message):
         ChatMessage(role=role, content=message))
 
 def create_chain():
-    prompt = ChatPromptTemplate.from_messages(
-        [
-            ("system", "당신은 친절한 AI 어시스턴트입니다."),
-            ("user", "#Question:\n{question}"),
-        ]
-    )
+    prompt = ChatPromptTemplate.from_messages([
+        SystemMessage(content="당신은 친절한 AI 어시스턴트입니다."),
+        MessagesPlaceholder(variable_name="history"),
+        HumanMessage(content="{input}"),
+    ])
     model = ChatGoogleGenerativeAI(model="gemini-2.5-flash")
     output_parsers = StrOutputParser()
 
     chain = prompt | model | output_parsers
-
     return chain
 
 print_messages()
@@ -55,16 +55,32 @@ if user_input := st.chat_input("시간 또는 주식에 대해 물어 보세요!
         st.chat_message("user").write(user_input)
         add_message("user", user_input)
 
-        # 타이핑하듯이 답변 출력
-        response = st.session_state["chain"].stream(
-            {"question": st.session_state.messages})
-        
+        # history: BaseMessage 리스트 생성
+        history = []
+        for msg in st.session_state.messages:
+            if hasattr(msg, "role") and hasattr(msg, "content"):
+                if msg.role == "user":
+                    history.append(HumanMessage(content=msg.content))
+                elif msg.role == "assistant":
+                    history.append(AIMessage(content=msg.content))
+            elif isinstance(msg, dict) and "role" in msg and "content" in msg:
+                if msg["role"] == "user":
+                    history.append(HumanMessage(content=msg["content"]))
+                elif msg["role"] == "assistant":
+                    history.append(AIMessage(content=msg["content"]))
+
+        # MessagesPlaceholder 대응! history + input으로 stream
+        response = st.session_state["chain"].stream({
+            "history": history,
+            "input": user_input
+        })
+
         with st.chat_message("assistant"):
-            container = st.empty()  # 페이지 전체를 다시 로드하지 않고도 콘텐츠를 동적으로 업데이트하는 빈 컨테이너 생성
+            container = st.empty()
 
             ai_answer = ""
 
-            for token in response:  # response는 generator
+            for token in response:
                 ai_answer += token
                 container.markdown(ai_answer)
 
